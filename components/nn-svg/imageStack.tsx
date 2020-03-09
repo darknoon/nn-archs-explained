@@ -1,34 +1,54 @@
 import { range } from "../util";
+import { useState, useRef } from "react";
 
-const { round, max, min, floor } = Math;
+const { round, max, min, floor, ceil } = Math;
 
 /**
  * Horizontal stack of images
  **/
 const int3Format = Intl.NumberFormat("en-US", { minimumIntegerDigits: 3 });
 
-export default ({ gridSize, width, height, channels = 256, dataKey = "" }) => {
+function useHoverN(initial = 0, count = 0) {
+  const [hoveredN, setHoveredN] = useState(initial);
+  const funcs = [...range(count)].map(i => e => setHoveredN(i));
+  return [hoveredN, funcs];
+}
+
+export default ({
+  gridSize,
+  width,
+  height,
+  channels = 256,
+  channelsPerImage = 1,
+  dataKey = ""
+}) => {
+  const images = ceil(channels / channelsPerImage);
   const maxWidth = 20 * gridSize;
   const top = 3 * gridSize;
   const offsetEach = gridSize;
-  const ds = s =>
-    min(
-      max(round(s / gridSize / 2) * gridSize, gridSize),
-      maxWidth - 2 * offsetEach
-    );
+
+  // This code made the image sizes variable
+  // const ds = s =>
+  //   min(
+  //     max(round(s / gridSize / 2) * gridSize, gridSize),
+  //     maxWidth - 2 * offsetEach
+  //   );
+  // I think it looks better contstant at the moment
+  const ds = _ => 128;
+
   const displayWidth = ds(width);
   const displayHeight = ds(height);
-  const nShown = min(
-    1 + floor((maxWidth - displayWidth) / offsetEach),
-    channels
-  );
+  const nShown = min(1 + floor((maxWidth - displayWidth) / offsetEach), images);
+
+  const [hoveredN, funcs] = useHoverN(0, nShown);
+
   const endX = displayWidth + nShown * offsetEach;
   const strokeWidth = 1;
   const shape = [channels, height, width];
   return (
     <g stroke="none" strokeWidth={strokeWidth} fill="none" fill-rule="evenodd">
       <g>
-        {[...range(channels)].reverse().map(n => {
+        {[...range(images)].reverse().map(n => {
           const first = n == 0;
           if (n < nShown) {
             let im;
@@ -37,11 +57,13 @@ export default ({ gridSize, width, height, channels = 256, dataKey = "" }) => {
                 <image
                   width={displayWidth}
                   height={displayHeight}
+                  onMouseEnter={funcs[n]}
                   href={`${dataKey}_${int3Format.format(n)}.jpg`}
                   x={n * offsetEach}
+                  style={{ imageRendering: "pixelated" }}
                   y={top}
                   key={`image-${n}`}
-                  opacity={first ? 1 : 0.125}
+                  opacity={first || n == hoveredN ? 1 : 0.125}
                 />
               );
             }
