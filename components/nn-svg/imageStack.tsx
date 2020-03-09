@@ -41,7 +41,7 @@ export default ({ gridSize, width, height, channels = 256, dataKey = "" }) => {
                   x={n * offsetEach}
                   y={top}
                   key={`image-${n}`}
-                  opacity={first ? 1 : 0.3}
+                  opacity={first ? 1 : 0.125}
                 />
               );
             }

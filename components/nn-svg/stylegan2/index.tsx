@@ -3,6 +3,7 @@ import { range } from "../../util";
 import { translate } from "../svgutil";
 import ImageStack from "../imageStack";
 import ToRGB from "./ToRGB";
+import BackArrow from "../BackArrow";
 
 const { log2, pow, max } = Math;
 
@@ -24,8 +25,8 @@ const getLayers = (outputResolution, channelMultiplier) => {
     { wLog2: 6, width: 64, channels: 256 * channelMultiplier },
     { wLog2: 7, width: 128, channels: 128 * channelMultiplier },
     { wLog2: 8, width: 256, channels: 64 * channelMultiplier },
-    { wLog2: 9, width: 512, channels: 32 * channelMultiplier },
-    { wLog2: 10, width: 1024, channels: 16 * channelMultiplier }
+    { wLog2: 9, width: 512, channels: 32 * channelMultiplier }
+    // { wLog2: 10, width: 1024, channels: 16 * channelMultiplier }
   ];
 };
 
@@ -34,7 +35,6 @@ export const Network = ({
   exampleKey = "data/stylegan2-seed15"
 }) => {
   const { imageSize: outputSize, channelMultiplier } = config;
-  const nLayers = log2(outputSize) + 1;
   const layers = getLayers(outputSize, channelMultiplier);
   const width = 160 * gridSize;
   const blockHeight = 40 * gridSize;
@@ -50,7 +50,14 @@ export const Network = ({
         version="1.1"
       >
         {layers.map(({ width, channels }, i) => (
-          <g transform={translate(0, i * blockHeight)}>
+          <g
+            key={`layers-${width}`}
+            transform={translate(gridSize, i * blockHeight)}
+          >
+            {/* Arrow to next goes at the back */}
+            <g transform={translate(-1 * gridSize, 18 * gridSize)}>
+              <BackArrow />
+            </g>
             {/* Show the block on the left */}
             <Block channels={channels} width={width} height={width} />
             {/* Now the outputs on the right */}
@@ -65,11 +72,20 @@ export const Network = ({
             </g>
           </g>
         ))}
-        <g transform={translate(0, nLayers * blockHeight)}>
-          <ToRGB />
+        {/* End -> RGB */}
+        <g transform={translate(0, layers.length * blockHeight)}>
+          <g transform={translate(0, 12 * gridSize)}>
+            <ToRGB />
+          </g>
           {/* Final output on the right */}
-          <g transform={translate(12 * gridSize + 512, 0)}>
-            <image width={512} height={512} href={`${exampleKey}/image.jpg`} />
+          <g transform={translate(0, 0)}>
+            <image
+              x={65 * gridSize}
+              y={2 * gridSize}
+              width={outputHeight}
+              height={outputHeight}
+              href={`${exampleKey}/image.jpg`}
+            />
           </g>
         </g>
       </svg>
