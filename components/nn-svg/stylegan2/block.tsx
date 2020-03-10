@@ -15,10 +15,20 @@ const Block = ({ channels, width, height }: BlockProps) => (
   <g fill="none" fillRule="evenodd" stroke="none" strokeWidth="1">
     <g>
       <g transform={translate(16 * gridSize, 10 * gridSize)}>
-        <Convolution inputChannels={channels} outputChannels={channels} />
+        <Convolution
+          inputChannels={channels}
+          outputChannels={channels}
+          width={width}
+          height={height}
+        />
       </g>
       <g transform={translate(68 * gridSize, 10 * gridSize)}>
-        <Convolution inputChannels={channels} outputChannels={channels} />
+        <Convolution
+          inputChannels={channels}
+          outputChannels={channels}
+          width={width}
+          height={height}
+        />
       </g>
       <g fill="#D8D8D8" stroke="#000" transform="translate(96 112)">
         <path d="M16 7a9 9 0 110 18 9 9 0 010-18z" opacity="0.3"></path>

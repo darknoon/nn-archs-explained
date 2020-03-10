@@ -14,7 +14,11 @@ function useHoverN(initial = 0, count = 0) {
   return [hoveredN, funcs];
 }
 
-export default ({
+const maxWidthUnits = 20;
+
+const width = ({ gridSize }) => maxWidthUnits * gridSize;
+
+const ImageStack = ({
   gridSize,
   width,
   height,
@@ -23,7 +27,7 @@ export default ({
   dataKey = ""
 }) => {
   const images = ceil(channels / channelsPerImage);
-  const maxWidth = 20 * gridSize;
+  const maxWidth = ImageStack.width({ gridSize });
   const top = 3 * gridSize;
   const offsetEach = gridSize;
 
@@ -109,3 +113,7 @@ export default ({
     </g>
   );
 };
+
+ImageStack.width = width;
+
+export default ImageStack;

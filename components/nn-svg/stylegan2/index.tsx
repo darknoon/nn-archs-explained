@@ -4,6 +4,8 @@ import { translate } from "../svgutil";
 import ImageStack from "../imageStack";
 import ToRGB from "./ToRGB";
 import BackArrow from "../BackArrow";
+import MultiLayerPerceptron from "../MultiLayerPerceptron";
+import SymbolKey from "../symbols/Key";
 
 const { log2, pow, max } = Math;
 
@@ -36,11 +38,17 @@ export const Network = ({
 }) => {
   const { imageSize: outputSize, channelMultiplier } = config;
   const layers = getLayers(outputSize, channelMultiplier);
-  const width = 160 * gridSize;
+  const width = 140 * gridSize + ImageStack.width({ gridSize });
+  const mappingHeight = 14 * gridSize;
   const blockHeight = 40 * gridSize;
-  const toRGBHeight = ToRGB.height({});
-  const outputHeight = 512;
-  const height = blockHeight * layers.length + max(toRGBHeight, outputHeight);
+  const toRGBHeight = ToRGB.height({ width: outputSize, height: outputSize });
+  const displayOutputHeight = 512;
+  const height =
+    mappingHeight +
+    blockHeight * layers.length +
+    max(toRGBHeight, displayOutputHeight) +
+    SymbolKey.height();
+
   return (
     <>
       <svg
@@ -49,10 +57,21 @@ export const Network = ({
         viewBox={`0 0 ${width} ${height}`}
         version="1.1"
       >
+        <g transform={translate(0, 0 * gridSize)}>
+          <MultiLayerPerceptron
+            numLayers={config.mappingLayers}
+            gridSize={gridSize}
+            inputCount={512}
+            outputCount={512}
+          />
+          {/* Arrow to next goes at the back */}
+          <g transform={translate(0 * gridSize, -12 * gridSize)}></g>
+        </g>
+
         {layers.map(({ width, channels }, i) => (
           <g
             key={`layers-${width}`}
-            transform={translate(gridSize, i * blockHeight)}
+            transform={translate(gridSize, mappingHeight + i * blockHeight)}
           >
             {/* Arrow to next goes at the back */}
             <g transform={translate(-1 * gridSize, 18 * gridSize)}>
@@ -73,20 +92,30 @@ export const Network = ({
           </g>
         ))}
         {/* End -> RGB */}
-        <g transform={translate(0, layers.length * blockHeight)}>
+        <g
+          transform={translate(0, mappingHeight + layers.length * blockHeight)}
+        >
           <g transform={translate(0, 12 * gridSize)}>
-            <ToRGB />
+            <ToRGB width={outputSize} height={outputSize} />
           </g>
           {/* Final output on the right */}
           <g transform={translate(0, 0)}>
             <image
               x={65 * gridSize}
               y={2 * gridSize}
-              width={outputHeight}
-              height={outputHeight}
+              width={displayOutputHeight}
+              height={displayOutputHeight}
               href={`${exampleKey}/image.jpg`}
             />
           </g>
+        </g>
+        <g
+          transform={translate(
+            0,
+            mappingHeight + layers.length * blockHeight + displayOutputHeight
+          )}
+        >
+          <SymbolKey />
         </g>
       </svg>
     </>

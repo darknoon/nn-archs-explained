@@ -2,12 +2,7 @@ export const size = {
   width: 176,
   height: 96
 };
-export default ({
-  inputChannels = 512,
-  outputChannels = 512,
-  width = 128,
-  height = 128
-}) => (
+export default ({ inputChannels = 512, outputChannels, width, height }) => (
   <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
     <g id="Block-Horizontal" transform="translate(-127.000000, -80.000000)">
       <g id="Convolution" transform="translate(128.000000, 80.000000)">
