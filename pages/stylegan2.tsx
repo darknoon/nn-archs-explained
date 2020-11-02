@@ -16,8 +16,10 @@ export default () => (
     </header>
 
     <main>
-      <h1 className="title">StyleGAN2</h1>
-      <h2>2019</h2>
+      <div className="title">
+        <h1>StyleGAN2</h1>
+        <h2>2019</h2>
+      </div>
       <p>
         StyleGAN2 is a paper by Karras et al that extends on the authors’
         previous work StyleGAN and Progressive Growing. The architecture is
@@ -45,6 +47,23 @@ export default () => (
         flex-direction: column;
         justify-content: center;
         align-items: center;
+      }
+
+      .title {
+        display: flex;
+        font-size: 64px;
+        flex-direction: row;
+        margin-bottom: 2rem;
+      }
+
+      .title * {
+        font-size: 64px;
+        margin: 0;
+      }
+
+      .title h2 {
+        font-weight: 200;
+        font-size: 64px;
       }
 
       main {
